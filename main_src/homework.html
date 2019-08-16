@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Layout HomeWork</title>
+
+    <link rel="stylesheet" type="text/css" href="../resources/css/ext-all.css" />
+    <link rel="stylesheet" type="text/css" href="../examples/ux/css/ColumnNodeUI.css" />
+    <link rel="stylesheet" type="text/css" href="../examples/ux/css/CenterLayout.css" />
+    <script type="text/javascript" src="../adapter/ext/ext-base.js"></script>
+    <script type="text/javascript" src="../ext-all.js"></script>
+    <script type="text/javascript" src="../examples/ux/ColumnNodeUI.js"></script>
+    <script type="text/javascript" src="../examples/ux/CenterLayout.js"></script>
+
+    <script>
+        let type = {
+            1: '班级',
+            2: '学生',
+            3: ''
+        }
+        let actions = {
+            'del': (node) => {
+                if (node.parentNode) node.remove()
+            },
+            'add': (node) => { Ext.getCmp('form').setTitle(`即将新增${type[node.getDepth()]}信息`) }
+        }
+        Ext.onReady(function () {
+            let currentNode = null
+            var contextmenu = new Ext.menu.Menu({
+                items: [
+                    {
+                        action: 'add',
+                        text: '添加信息',
+                    },
+                    {
+                        action: 'del',
+                        text: '删除信息',
+                    }
+                ],
+                listeners: {
+                    itemclick: function (item) {
+                        actions[item.action](currentNode)
+                    }
+                }
+            })
+            let tree = new Ext.ux.tree.ColumnTree({
+                autoScroll: true,
+                rootVisible: false,
+                title: '学生管理系统',
+                id: 'tree',
+                enableDD: true,
+                useArrows: true,
+                height:500,
+                columns: [{
+                    header: '名称',
+                    width: 950,
+                    dataIndex: 'text'
+                }],
+                loader: new Ext.tree.TreeLoader({
+                    dataUrl: 'info.json'
+                }),
+                root: new Ext.tree.AsyncTreeNode({ text: '信息管理', expanded: true }),
+                listeners: {
+                    contextmenu: function (node, e) {
+                        e.preventDefault();
+                        node.select();
+                        currentNode = node;
+                        contextmenu.showAt(e.getXY())
+                    }
+                }
+            })
+            let form = new Ext.form.FormPanel({
+                id: 'form',
+                title: '添加表单',
+                labelAlign: 'center',
+                frame: true,
+                fileUpload: true,
+                items: [{
+                    xtype: 'textfield',
+                    width: 200,
+                    emptyText: 'please input your textField',
+                    msgTarget: 'side',
+                    allowBlank: false,
+                    name: 'info'
+                }],
+                buttons: [{
+                    text: '重置',
+                    handler: function () {
+                        Ext.getCmp('form').getForm().reset()
+                    }
+                }, {
+                    text: '新增',
+                    handler: function () {
+                        if (Ext.getCmp('form').getForm().isValid()) {
+                            if (currentNode == null) Ext.Msg.alert('错误', '请选择节点！')
+                            else {
+                                let depth = currentNode.getDepth()
+                                currentNode = depth == 2 ? currentNode : currentNode.parentNode
+                                if (depth == 1) {
+                                    let treeNode = new Ext.tree.TreeNode({ text: `班级：${Ext.getCmp('form').getForm().getFieldValues(true).info}` })
+                                    treeNode.appendChild(new Ext.tree.TreeNode({ text: '学生' }))
+                                    currentNode.appendChild(treeNode)
+                                }
+                                else currentNode.appendChild(new Ext.tree.TreeNode({ text: Ext.getCmp('form').getForm().getFieldValues(true).info, leaf: true }));
+                            }
+                        }
+                    }
+                }]
+            })
+
+            //主
+            var viewport = new Ext.Viewport({
+                layout: 'ux.center',
+                autoScroll: true,    
+                items: [{
+                    autoHeight:true,
+                    width: '50%',
+                    items: [tree, form]
+                }]
+            })
+            viewport.show()
+        });
+    </script>
+</head>
+
+<body>
+</body>
+
+</html>

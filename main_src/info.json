@@ -1,0 +1,10 @@
+[{
+    text:'班级：博盈',
+    children:[{
+        text:'学生',
+        children:[{
+            text:'李杰瑞',
+            leaf:true,
+        }]
+    }]
+}]
