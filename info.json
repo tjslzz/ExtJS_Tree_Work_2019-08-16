@@ -1,0 +1,20 @@
+[{
+    name:'班级',
+    info:'博盈',
+    uiProvider:'col',
+    cls:'master-task',
+    iconCls:'task-folder',
+    children:[{
+        name:'学生',
+        info:'学生集合',
+        uiProvider:'col',
+        iconCls:'task',
+        children:[{
+            name:'李杰瑞',
+            info:'男性',
+            uiProvider:'col',
+            leaf:true,
+            iconCls:'task'
+        }]
+    }]
+}]

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Layout HomeWork</title>
+
+    <link rel="stylesheet" type="text/css" href="../resources/css/ext-all.css" />
+    <link rel="stylesheet" type="text/css" href="../examples/ux/css/ColumnNodeUI.css" />
+    <script type="text/javascript" src="../adapter/ext/ext-base.js"></script>
+    <script type="text/javascript" src="../ext-all.js"></script>
+    <script type="text/javascript" src="../examples/ux/ColumnNodeUI.js"></script>
+    <script>
+        let actions = {
+            'delete': (node) => {
+                if (node.parentNode) node.remove()
+            }
+        }
+        Ext.onReady(function () {
+            let currentNode = null
+            let tree = new Ext.ux.tree.ColumnTree({
+                autoScroll: true,
+                width: 1610,
+                title: '学生管理系统',
+                id: 'tree',
+                columns: [{
+                    header: '名称',
+                    width: 800,
+                    dataIndex: 'name'
+                }, {
+                    header: '描述',
+                    width: 800,
+                    dataIndex: 'info'
+                }],
+                loader: new Ext.tree.TreeLoader({
+                    dataUrl: 'info.json',
+                    uiProviders: {
+                        'col': Ext.ux.tree.ColumnNodeUI
+                    }
+                }),
+                root: new Ext.tree.AsyncTreeNode({text:'信息管理',expanded:true}),
+                listeners: {
+                    click: function (node, e) {
+                        currentNode = node
+                        Ext.getCmp('form').setTitle(`即将新增 ${node.attributes.name} 信息`)
+                    }
+                }
+            });
+            let form = new Ext.form.FormPanel({
+                id: 'form',
+                title: '添加表单',
+                labelAlign: 'center',
+                frame: true,
+                width: 1610,
+                fileUpload: true,
+                items: [{
+                    xtype: 'textfield',
+                    width: 200,
+                    emptyText: 'please input your textField',
+                    msgTarget: 'side',
+                    allowBlank: false,
+                    name: 'info'
+                }],
+                buttons: [{
+                    text: 'reset',
+                    handler: function () {
+                        Ext.getCmp('form').getForm().reset();
+                    }
+                }, {
+                    text: 'submit',
+                    handler: function () {
+                        if (Ext.getCmp('form').getForm().isValid()) {
+                            if (currentNode == null) Ext.Msg.alert('错误', '请选择节点！');
+                            else {
+                                currentNode.parentNode.appendChild(new Ext.tree.TreeNode({ text: Ext.getCmp('form').getForm().getFieldValues(true).info }));
+                                // Ext.Msg.alert('Submitted Values', Ext.getCmp('form').getForm().getFieldValues(true).info);
+                            }
+                        }
+                    }
+                }]
+            });
+
+            //主
+            var viewport = new Ext.Viewport({
+                items: [tree, form]
+            });
+            viewport.show()
+        });
+    </script>
+</head>
+
+<body>
+</body>
+
+</html>
