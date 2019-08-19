@@ -53,7 +53,7 @@
                 id: 'tree',
                 enableDD: true,
                 useArrows: true,
-                height:500,
+                height: 500,
                 columns: [{
                     header: '名称',
                     width: 950,
@@ -69,6 +69,10 @@
                         node.select();
                         currentNode = node;
                         contextmenu.showAt(e.getXY())
+                    },
+                    click: function (node, e) {
+                        currentNode = node
+                        actions['add'](currentNode)
                     }
                 }
             })
@@ -110,13 +114,19 @@
                     }
                 }]
             })
-
+            let treeEditor = new Ext.tree.TreeEditor(tree, { allowBlank: false }, {
+                listeners: {
+                    complete: function (editor, now, old) {
+                        Ext.Msg.alert('Tree Editor', `从 ${old} 到 ${now}`);
+                    }
+                }
+            });
             //主
             var viewport = new Ext.Viewport({
                 layout: 'ux.center',
-                autoScroll: true,    
+                autoScroll: true,
                 items: [{
-                    autoHeight:true,
+                    autoHeight: true,
                     width: '50%',
                     items: [tree, form]
                 }]
